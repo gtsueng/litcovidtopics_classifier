@@ -9,17 +9,18 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, roc_auc_score
 from datetime import datetime
+import pathlib
 
+script_path = pathlib.Path(__file__).parent.absolute()
 
 #### Paths
-DATAPATH = 'data/'
+DATAPATH = os.path.join(script_path,'data/')
+RESULTPATH = os.path.join(script_path,'results/')
+MODELPATH = os.path.join(script_path,'models/')
+PREDICTPATH = os.path.join(script_path,'predictions/')
 topicsfile = os.path.join(DATAPATH,'litcovidtopics.tsv')
 topicsdf = read_csv(topicsfile,delimiter='\t',header=0,index_col=0)
 topiclist = topicsdf['topicCategory'].unique().tolist()
-RESULTPATH = 'results/'
-MODELPATH = 'models/'
-PREDICTPATH = 'predictions/'
-
 
 
 #### Fetch Relevant metadata
@@ -361,9 +362,7 @@ def load_annotations(topiclist,classifiers):
     classifierlist = classifiers.keys()
     total_agree = merge_predictions(topiclist,classifierlist,agreetype='perfect')
     cleanresults = clean_results(total_agree)
-    #cleanresults.to_csv(os.path.join(RESULTPATH,'predictions.tsv'),sep='\t',header=0)
-    for doc in json.loads(cleanresults.to_json(orient="records")):
-        yield(doc)
+    cleanresults.to_json(os.path.join(RESULTPATH,'preprint_categories.json'),orient="records")
         
 
 
